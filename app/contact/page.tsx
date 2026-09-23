@@ -1,0 +1,2 @@
+import { Footer, Header, PageIntro } from "../components";
+export default function ContactPage() { return <><Header /><PageIntro eyebrow="Say hello" title="Let&apos;s talk local food." text="Have a question, want to join a market, or just want to tell us about a great farmer? We would love to hear from you." /><section className="section"><div className="container detail-copy"><h2>hello@marketlink.local</h2><p>We are keeping this first public experience intentionally simple while the MarketLink community takes shape.</p></div></section><Footer /></>; }

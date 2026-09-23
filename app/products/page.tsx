@@ -1,0 +1,3 @@
+import { Footer, FilterBar, Header, PageIntro, ProductShelf } from "../components";
+
+export default function ProductsPage() { return <><Header /><main><PageIntro eyebrow="This week&apos;s good stuff" title="Fresh from local farmers." text="See what is available now, find your favourites, and reserve them for pickup at the market." /><section className="page-content"><div className="container"><FilterBar product /><div className="results-heading"><p><strong>48 products</strong> from local farmers</p><div className="sort-select">Recommended <span>⌄</span></div></div><ProductShelf limit={6} /></div></section></main><Footer /></>; }

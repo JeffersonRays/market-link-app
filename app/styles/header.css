@@ -1,0 +1,80 @@
+.site-header {
+  background: rgba(250, 247, 239, 0.92);
+  border-bottom: 1px solid rgba(220, 227, 217, 0.8);
+  position: relative;
+  z-index: 10;
+}
+
+.nav-wrap {
+  height: 78px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--deep);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.logo > span:last-child span {
+  color: var(--fresh);
+}
+
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px 11px 11px 3px;
+  display: grid;
+  place-items: center;
+  background: var(--deep);
+  color: #d4e9b5;
+  transform: rotate(-9deg);
+}
+
+.logo-mark svg {
+  transform: rotate(9deg);
+}
+
+.logo-light {
+  color: #fff;
+}
+
+.logo-light > span:last-child span {
+  color: #b3d877;
+}
+
+.logo-light .logo-mark {
+  background: #b3d877;
+  color: var(--deep);
+}
+
+.main-nav a:hover,
+.sign-in:hover {
+  color: var(--deep);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sign-in {
+  color: #536157;
+}
+
+.menu-toggle {
+  display: none;
+  border: 0;
+  background: none;
+  color: var(--deep);
+}
+
