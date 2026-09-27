@@ -1,3 +1,3 @@
-import { Footer, FilterBar, FarmerShelf, Header, PageIntro } from "../components";
+import { FarmersDirectory } from "../api-pages";
 
-export default function FarmersPage() { return <><Header /><main><PageIntro eyebrow="Know your growers" title="Meet the farmers behind your food." text="Independent growers, bakers and food makers bringing the good stuff to markets around Lagos." /><section className="page-content"><div className="container"><FilterBar /><div className="results-heading"><p><strong>24 farmers</strong> in the MarketLink community</p><div className="sort-select">Recommended <span>⌄</span></div></div><FarmerShelf limit={4} /></div></section></main><Footer /></>; }
+export default function FarmersPage() { return <FarmersDirectory />; }

@@ -1,0 +1,190 @@
+.api-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.api-list {
+  display: grid;
+  gap: 14px;
+  margin: 22px 0;
+}
+.api-card {
+  display: block;
+  padding: 22px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(28, 56, 40, 0.04);
+}
+.api-card h2,
+.api-card h3 {
+  color: var(--deep);
+  margin: 7px 0 10px;
+}
+.api-card p,
+.api-card small {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.api-card small {
+  display: block;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+.api-card strong {
+  display: block;
+  font-size: 30px;
+  color: var(--deep);
+  margin-top: 10px;
+}
+.api-card pre,
+.api-row {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 240px;
+  overflow: auto;
+  padding: 12px;
+  background: #f5f7f2;
+  font-size: 11px;
+}
+.directory-input {
+  width: 100%;
+  max-width: 560px;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  background: #fff;
+  margin: 10px 0 15px;
+}
+.api-form {
+  display: grid;
+  gap: 14px;
+  width: min(620px, 100%);
+  padding: 24px;
+  margin: 24px 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.api-form h2 {
+  margin: 0 0 5px;
+  color: var(--deep);
+}
+.api-form label,
+.api-inline-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+.api-form input,
+.api-form textarea,
+.api-form select,
+.api-inline-form input,
+.api-inline-form textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: #fbfcf8;
+  color: var(--ink);
+}
+.api-form textarea,
+.api-inline-form textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+.api-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.api-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 14px;
+}
+.api-actions button,
+.api-card > button,
+.api-inline-form button {
+  border: 1px solid var(--border);
+  background: #f5f7f2;
+  color: var(--deep);
+  padding: 10px 13px;
+  font-weight: 700;
+  border-radius: 6px;
+}
+.api-detail-block {
+  margin: 32px 0;
+}
+.api-detail-block h2 {
+  color: var(--deep);
+}
+.api-detail-meta,
+.api-back {
+  color: var(--muted);
+  margin: 18px 0;
+}
+.api-back a,
+.api-heading-row a {
+  color: var(--deep);
+  font-weight: 700;
+}
+.api-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+.api-inline-form {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.api-inline-form label {
+  flex: 1 1 220px;
+}
+.form-error {
+  color: #9d3427;
+  background: #fff2ef;
+  border: 1px solid #f0c8bf;
+  padding: 11px 13px;
+}
+.live-overview {
+  padding-bottom: 60px;
+}
+.live-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin: 25px 0;
+}
+.live-stat-grid .api-card {
+  padding: 19px;
+  text-transform: capitalize;
+}
+.live-overview .api-card-grid {
+  margin-top: 15px;
+}
+.dashboard-nav-link {
+  text-align: left;
+  border: 0;
+  width: 100%;
+  font: inherit;
+}
+
+@media (max-width: 640px) {
+  .api-form {
+    padding: 18px;
+  }
+  .api-card-grid {
+    grid-template-columns: 1fr;
+  }
+  .api-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
