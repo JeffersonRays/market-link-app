@@ -1,4 +1,3 @@
-import { Footer, Header, MapMock, MarketCard, PageIntro, FilterBar } from "../components";
-import { markets } from "../data";
+import { MarketsDirectory } from "../api-pages";
 
-export default function MarketsPage() { return <><Header /><main><PageIntro eyebrow="Find your next Saturday" title="Find a farmers market near you" text="Explore local markets, see who is selling today, and make your next fresh-food run one to look forward to." /><section className="page-content"><div className="container"><FilterBar /><div className="results-heading"><p><strong>{markets.length} markets</strong> around Lagos</p><div className="sort-select">List view <span>·</span> <span>Map view</span></div></div><div className="directory-layout"><div className="market-list">{markets.map((market) => <MarketCard market={market} key={market.slug} />)}</div><MapMock title="Lekki Farmers Market" /></div></div></section></main><Footer /></>; }
+export default function MarketsPage() { return <MarketsDirectory />; }

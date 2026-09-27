@@ -32,12 +32,16 @@
   border-radius: 11px 11px 11px 3px;
   display: grid;
   place-items: center;
-  background: var(--deep);
-  color: #d4e9b5;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e1e9df;
   transform: rotate(-9deg);
 }
 
-.logo-mark svg {
+.logo-mark img {
+  width: 29px;
+  height: 29px;
+  object-fit: contain;
   transform: rotate(9deg);
 }
 
@@ -50,8 +54,8 @@
 }
 
 .logo-light .logo-mark {
-  background: #b3d877;
-  color: var(--deep);
+  background: #fff;
+  border-color: rgba(255,255,255,.8);
 }
 
 .main-nav a:hover,
@@ -69,6 +73,19 @@
 
 .sign-in {
   color: #536157;
+}
+
+.header-sign-out {
+  padding: 8px 2px;
+  border: 0;
+  background: transparent;
+  color: #536157;
+  font: inherit;
+  cursor: pointer;
+}
+
+.header-sign-out:hover {
+  color: var(--deep);
 }
 
 .menu-toggle {

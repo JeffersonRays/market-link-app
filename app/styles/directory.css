@@ -31,61 +31,8 @@
   margin: 20px 0 0;
 }
 
-.page-intro .search-bar {
-  margin-top: 30px;
-}
-
 .page-content {
   padding: 55px 0 95px;
-}
-
-.filter-bar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-}
-
-.filter-search {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  background: #fff;
-  border: 1px solid var(--border);
-  padding: 0 13px;
-  height: 43px;
-  flex: 1;
-  min-width: 210px;
-  color: var(--fresh);
-}
-
-.filter-search input {
-  outline: 0;
-  border: 0;
-  width: 100%;
-  color: var(--ink);
-  background: transparent;
-  font-size: 13px;
-}
-
-.filter-chip,
-.filter-button {
-  height: 43px;
-  border: 1px solid var(--border);
-  background: #fff;
-  padding: 0 13px;
-  display: flex;
-  align-items: center;
-  gap: 19px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.filter-chip:hover,
-.filter-button:hover {
-  color: var(--deep);
-  border-color: var(--fresh);
 }
 
 .results-heading {

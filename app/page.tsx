@@ -7,7 +7,6 @@ import {
   MapMock,
   MarketCard,
   ProductShelf,
-  SearchBar,
   SectionHeading,
 } from "./components";
 import { markets } from "./data";
@@ -119,20 +118,6 @@ export default function Home() {
                   <span>Reserve →</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SEARCH */}
-        <section className="search-panel home-search-panel">
-          <div className="container">
-            <div className="search-panel-inner home-search-inner">
-              <div className="home-search-copy">
-                <span>PLAN YOUR MARKET RUN</span>
-                <h3>What are you looking for this week?</h3>
-              </div>
-
-              <SearchBar large />
             </div>
           </div>
         </section>

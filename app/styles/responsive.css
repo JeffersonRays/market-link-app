@@ -119,23 +119,6 @@
     left: 20px;
     bottom: 86px;
   }
-  .search-panel-inner {
-    padding: 20px 15px;
-  }
-  .search-bar {
-    grid-template-columns: 1fr;
-    border: 0;
-    gap: 8px;
-  }
-  .search-field,
-  .search-select {
-    border: 1px solid var(--border);
-    min-height: 49px;
-  }
-  .search-bar > .button {
-    height: 49px;
-    border-radius: 7px;
-  }
   .section {
     padding: 68px 0;
   }
@@ -200,12 +183,6 @@
   }
   .page-intro h1 {
     font-size: 45px;
-  }
-  .filter-bar {
-    gap: 8px;
-  }
-  .filter-search {
-    flex-basis: 100%;
   }
   .results-heading {
     align-items: flex-start;
