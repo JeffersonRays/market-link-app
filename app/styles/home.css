@@ -70,8 +70,7 @@
   position: absolute;
   inset: 10px 0 15px 62px;
   border-radius: 180px 18px 18px 18px;
-  background: url("https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=90")
-    center/cover;
+  background: url("/image13.jpeg") center/cover;
   box-shadow: var(--shadow);
 }
 
@@ -620,7 +619,7 @@
   height: 700px;
   right: -230px;
   top: -320px;
-  background: #edf3db;
+  background: #DFBD97;
 }
 
 .hero-noise {

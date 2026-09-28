@@ -260,7 +260,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="container footer-grid">
         <div className="footer-intro">
-          <Logo light />
+          <Logo  />
           <p>A better way to shop local, one market at a time.</p>
           <div className="social-row">
             <span>ig</span>
@@ -288,8 +288,8 @@ export function Footer() {
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© 2026 MarketLink</span>
-        <span>Made for local food people.</span>
+        <span>© 2026 MarketLink.All rights reserved</span>
+        <span>Fresh food. Familiar faces.</span>
       </div>
     </footer>
   );

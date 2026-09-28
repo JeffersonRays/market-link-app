@@ -49,30 +49,30 @@ export const markets: Market[] = [
     hours: "8:00 AM – 2:00 PM",
     farmers: 42,
     open: true,
-    image: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1000&q=85",
+    image: "/image4.jpeg",
     description: "A bright Saturday gathering of growers, bakers and makers in the heart of Lekki.",
   },
   {
     slug: "yaba-fresh-market",
-    name: "Yaba Fresh Market",
+    name: "Victoria island Market",
     area: "Herbert Macaulay Way, Yaba",
     days: "Wednesdays & Saturdays",
     hours: "7:00 AM – 1:00 PM",
     farmers: 31,
     open: true,
-    image: "https://images.unsplash.com/photo-1488327761082-19d7c7f16aab?auto=format&fit=crop&w=1000&q=85",
+    image: "/image8.jpeg",
     description: "Midweek and weekend produce runs, with trusted neighbourhood farmers and pantry staples.",
   },
   {
     slug: "victoria-island-green-market",
-    name: "VI Green Market",
+    name: "Yaba Community Market",
     area: "Eko Atlantic Boulevard",
     days: "Sundays",
     hours: "9:00 AM – 3:00 PM",
     farmers: 26,
     open: false,
-    image: "https://images.unsplash.com/photo-1506484381205-f7947c9f9c78?auto=format&fit=crop&w=1000&q=85",
-    description: "Slow Sunday shopping with seasonal fruit, flowers and small-batch local food.",
+    image: "/image12.jpeg",    
+     description: "Slow Sunday shopping with seasonal fruit, flowers and small-batch local food.",
   },
   {
     slug: "ikeja-community-market",
@@ -143,12 +143,12 @@ export const farmers: Farmer[] = [
 ];
 
 export const products: Product[] = [
-  { slug: "fresh-tomatoes", name: "Vine-ripened tomatoes", farmer: "Green Acre Farms", farmerSlug: "green-acre-farms", market: "Lekki Farmers Market", price: "₦1,800", unit: "per kg", availability: "12 kg left", status: "available", sellingToday: true, image: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=900&q=85", category: "Vegetables", description: "Bright, juicy tomatoes picked at their peak for sauces, salads and everything in between." },
-  { slug: "sweet-carrots", name: "Sweet young carrots", farmer: "Root & Rind", farmerSlug: "root-and-rind", market: "Lekki Farmers Market", price: "₦1,200", unit: "per bunch", availability: "8 bunches left", status: "low", sellingToday: false, image: "https://images.unsplash.com/photo-1445282768818-728615cc910a?auto=format&fit=crop&w=900&q=85", category: "Vegetables", description: "Tender, sweet young carrots with their tops on. Perfect for roasting or snacking." },
-  { slug: "butter-lettuce", name: "Butter lettuce", farmer: "Green Acre Farms", farmerSlug: "green-acre-farms", market: "VI Green Market", price: "₦900", unit: "per head", availability: "20 heads left", status: "available", sellingToday: true, image: "https://images.unsplash.com/photo-1622205313162-be1d5712a43c?auto=format&fit=crop&w=900&q=85", category: "Leafy greens", description: "Soft, fresh leaves harvested this week. A lovely base for bright, crunchy salads." },
-  { slug: "strawberries", name: "Punnets of strawberries", farmer: "Sunrise Orchards", farmerSlug: "sunrise-orchards", market: "Yaba Fresh Market", price: "₦2,500", unit: "per punnet", availability: "6 punnets left", status: "low", sellingToday: true, image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=900&q=85", category: "Fruit", description: "Small-batch strawberries with a deep berry flavour. Best enjoyed within a few days." },
-  { slug: "free-range-eggs", name: "Free-range eggs", farmer: "Root & Rind", farmerSlug: "root-and-rind", market: "Ikeja Community Market", price: "₦2,200", unit: "per dozen", availability: "14 dozens left", status: "available", sellingToday: false, image: "https://images.unsplash.com/photo-1569288052389-dac9b01c9c9c?auto=format&fit=crop&w=900&q=85", category: "Pantry", description: "Rich-yolked eggs from happy hens, collected and packed for the week ahead." },
-  { slug: "country-sourdough", name: "Country sourdough", farmer: "The Bread Table", farmerSlug: "the-bread-table", market: "Lekki Farmers Market", price: "₦3,500", unit: "per loaf", availability: "5 loaves left", status: "low", sellingToday: true, image: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=900&q=85", category: "Bakery", description: "A deeply flavoured, long-fermented loaf with a crisp crust and soft, chewy crumb." },
+  { slug: "fresh-tomatoes", name: "Vine-ripened tomatoes", farmer: "Ada's Farms", farmerSlug: "green-acre-farms", market: "Lekki Farmers Market", price: "₦1,800", unit: "per kg. 12kg left", availability: "Reserve", status: "available", sellingToday: true,  image: "/image11.jpeg",     category: "Vegetables", description: "Bright, juicy tomatoes picked at their peak for sauces, salads and everything in between." },
+  { slug: "butter-lettuce", name: "Butter lettuce", farmer: "Green fields", farmerSlug: "green-acre-farms", market: "Victoria Island  Market", price: "₦1,200", unit: "per head. 18 left", availability: "Reserve", status: "available", sellingToday: true, image: "/image10.jpeg",     category: "Leafy greens", description: "Soft, fresh leaves harvested this week. A lovely base for bright, crunchy salads." },
+  { slug: "country-sourdough", name: "Country sourdough", farmer: "Sunday Bread Co.", farmerSlug: "the-bread-table", market: "Lekki Farmers Market", price: "₦3,500", unit: "per loaf. 9 left", availability: "Reserve", status: "low", sellingToday: true,  image: "/image9.jpeg",    category: "Bakery", description: "A deeply flavoured, long-fermented loaf with a crisp crust and soft, chewy crumb." },
+  { slug: "free-range-eggs", name: "Free-range eggs", farmer: "Morning Hen Farm", farmerSlug: "root-and-rind", market: "Yaba Community Market", price: "₦4,200", unit: "per tray. 7 left", availability: "Reserve", status: "available", sellingToday: false, image: "/image7.jpeg",     category: "Pantry", description: "Rich-yolked eggs from happy hens, collected and packed for the week ahead." },
+  { slug: "sweet-carrots", name: "Sweet young carrots", farmer: "Green Fields", farmerSlug: "root-and-rind", market: "Lekki Farmers Market", price: "₦2,200", unit: "per bunch. 15 left", availability: "Reserve", status: "low", sellingToday: false,  image: "/image6.jpeg",     category: "Vegetables", description: "Tender, sweet young carrots with their tops on. Perfect for roasting or snacking." },
+  { slug: "strawberries", name: "Sweet Mango", farmer: "Sunrise Orchards", farmerSlug: "sunrise-orchards", market: "Yaba Community Market", price: "₦2,400", unit: "per basket. 10 left", availability: "Reserve", status: "low", sellingToday: true,  image: "/image5.jpeg",     category: "Fruit", description: "Small-batch strawberries with a deep berry flavour. Best enjoyed within a few days." },
 ];
 
 export const getMarket = (slug: string) => markets.find((market) => market.slug === slug);
