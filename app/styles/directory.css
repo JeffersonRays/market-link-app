@@ -1,0 +1,92 @@
+.section-heading h2,
+.page-intro h1 {
+  font-family: var(--font-dm-serif-display), serif;
+  font-weight: 500;
+  color: var(--deep);
+  letter-spacing: -0.04em;
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.08;
+}
+
+.page-intro {
+  padding: 70px 0 52px;
+  background: #f3f6ed;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-intro-copy {
+  max-width: 720px;
+}
+
+.page-intro h1 {
+  font-size: 58px;
+}
+
+.page-intro-copy > p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 590px;
+  font-size: 17px;
+  margin: 20px 0 0;
+}
+
+.page-content {
+  padding: 55px 0 95px;
+}
+
+.results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.results-heading p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 13px;
+}
+
+.sort-select {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: #fff;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.directory-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 25px;
+}
+
+.directory-layout .map-mock {
+  min-height: 570px;
+  position: sticky;
+  top: 20px;
+}
+
+.market-list {
+  display: grid;
+  gap: 17px;
+}
+
+.market-list .market-card {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+}
+
+.market-list .market-image {
+  height: 100%;
+  min-height: 220px;
+}
+
+.market-list .card-body {
+  padding: 23px;
+}
+
