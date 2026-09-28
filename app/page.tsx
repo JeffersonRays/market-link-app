@@ -118,14 +118,16 @@ export default function Home() {
     </div>
     <div className="market-run-filters">
       <button className="filter-pill green-pill">
-        All markets <span className="dropdown-arrow">v</span>
+        All markets 
       </button>
       <button className="filter-pill green-pill">
-        This week <span className="dropdown-arrow">v</span>
+        This week 
       </button>
-      <button className="filter-pill search-pill">
-        Search &rarr;
-      </button>
+    <Link href="/products">
+  <button className="filter-pill search-pill" style={{ cursor: 'pointer' }}>
+    Search &rarr;
+  </button>
+</Link>
     </div>
   </div>
 </section>
