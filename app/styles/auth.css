@@ -170,6 +170,23 @@
   box-shadow: 0 0 0 3px rgba(115, 169, 66, 0.12);
 }
 
+.auth-form textarea:not([type="checkbox"]) {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+  background: #fbfcf8;
+  color: var(--ink);
+  outline: 0;
+  padding: 13px 14px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.auth-form textarea:focus {
+  border-color: var(--fresh);
+  box-shadow: 0 0 0 3px rgba(115, 169, 66, 0.12);
+}
+
 .auth-form-row {
   display: flex;
   justify-content: space-between;

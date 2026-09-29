@@ -74,12 +74,6 @@ export default function Home() {
             <div className="hero-visual home-hero-visual">
               <div className="hero-photo home-hero-photo" />
 
-              <div className="hero-market-label">
-                <span className="mini-label">SATURDAY MARKET</span>
-                <strong>Lekki Farmers Market</strong>
-                <small>7:00 AM — 2:00 PM</small>
-              </div>
-
               <div className="hero-stamp home-hero-stamp">
                 <div>
                   <span>42+</span>
@@ -87,11 +81,6 @@ export default function Home() {
                   <br />
                   growers
                 </div>
-              </div>
-
-              <div className="today-chip home-today-chip">
-                <i />
-                Farmers selling today
               </div>
 
               <div className="floating-stock home-floating-stock">
@@ -121,8 +110,29 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <section className="market-run-section">
+          <div className="market-run-container">
+            <div className="market-run-content">
+              <span className="market-run-subtitle">PLAN YOUR MARKET RUN</span>
+              <h2 className="market-run-title">
+                What are you looking for this week?
+              </h2>
+            </div>
+            <div className="market-run-filters">
+              <button className="filter-pill green-pill">All markets</button>
+              <button className="filter-pill green-pill">This week</button>
+              <Link href="/products">
+                <button
+                  className="filter-pill search-pill"
+                  style={{ cursor: "pointer" }}
+                >
+                  Search &rarr;
+                </button>
+              </Link>
+            </div>
+          </div>
+        </section>
 
-        {/* QUICK VALUE STRIP */}
         <section className="home-value-strip">
           <div className="container home-value-grid">
             <div className="home-value-item">
@@ -151,7 +161,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* MARKETS */}
         <section className="section home-markets-section">
           <div className="container">
             <SectionHeading
@@ -263,94 +272,6 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="how-visual home-reservation-visual">
-              <div className="reservation-decoration reservation-decoration-one" />
-              <div className="reservation-decoration reservation-decoration-two" />
-
-              <div className="reservation-card">
-                <div className="reservation-card-header">
-                  <div>
-                    <span className="mini-label">YOUR RESERVATION</span>
-                    <h3>Saturday pickup</h3>
-                  </div>
-
-                  <span className="reservation-status">
-                    <i />
-                    Ready
-                  </span>
-                </div>
-
-                <div className="reservation-market">
-                  <span>Lekki Farmers Market</span>
-                  <small>Saturday · 9:00 AM – 11:00 AM</small>
-                </div>
-
-                <div className="reservation-items">
-                  <div className="reservation-item">
-                    <div className="reservation-product-dot tomatoes" />
-
-                    <div>
-                      <strong>Vine tomatoes</strong>
-                      <small>Ada&apos;s Farm</small>
-                    </div>
-
-                    <b>2 kg</b>
-                  </div>
-
-                  <div className="reservation-item">
-                    <div className="reservation-product-dot lettuce" />
-
-                    <div>
-                      <strong>Butter lettuce</strong>
-                      <small>Green Fields</small>
-                    </div>
-
-                    <b>2 heads</b>
-                  </div>
-
-                  <div className="reservation-item">
-                    <div className="reservation-product-dot bread" />
-
-                    <div>
-                      <strong>Country sourdough</strong>
-                      <small>Sunday Bread Co.</small>
-                    </div>
-
-                    <b>1 loaf</b>
-                  </div>
-                </div>
-
-                <div className="pickup-code-box">
-                  <div>
-                    <span>PICKUP CODE</span>
-                    <strong>ML-4827</strong>
-                  </div>
-
-                  <div className="pickup-code-bars">
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                  </div>
-                </div>
-
-                <div className="reservation-footer">
-                  <span>Payment</span>
-                  <strong>Pay farmer at pickup</strong>
-                </div>
-              </div>
-
-              <div className="reservation-floating-note">
-                <Icon name="check" size={15} />
-                Reserved stock secured
               </div>
             </div>
           </div>

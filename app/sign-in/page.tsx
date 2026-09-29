@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiData, getToken, roleHome, saveSession, type User } from "../../lib/api";
+import {
+  apiData,
+  getToken,
+  roleHome,
+  saveSession,
+  type User,
+} from "../../lib/api";
 import { Footer, Header, Icon } from "../components";
 import { useSession } from "../auth/useSession";
 
@@ -24,7 +30,9 @@ export default function SignInPage() {
         router.replace(roleHome(currentUser.role));
       })
       .catch(() => undefined);
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [ready, router, user?.id, user?.role]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {

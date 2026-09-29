@@ -1,3 +1,5 @@
 import { OrdersPage } from "../features";
 
-export default function Page() { return <OrdersPage />; }
+export default function Page() {
+  return <OrdersPage />;
+}
