@@ -191,7 +191,12 @@ export function Logo({ light = false }: { light?: boolean }) {
   return (
     <Link href="/" className={`logo ${light ? "logo-light" : ""}`}>
       <span className="logo-mark">
-        <Image src="/assets/marketlink-logo.png" alt="" width={34} height={34} />
+        <Image
+          src="/assets/marketlink-logo.png"
+          alt=""
+          width={34}
+          height={34}
+        />
       </span>
       <span>
         Market<span>Link</span>
@@ -225,23 +230,30 @@ export function Header() {
           </Link>
         </nav>
         <div className="nav-actions">
-          {ready && (user ? (
-            <>
-              <Link className="sign-in" href={roleHome(user.role)}>
-                My workspace
-              </Link>
-              <button className="header-sign-out" type="button" onClick={clearSession}>
-                Sign out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link className="sign-in" href="/sign-in">Sign in</Link>
-              <Link className="button button-small" href="/join">
-                Join MarketLink <Icon name="arrow" size={16} />
-              </Link>
-            </>
-          ))}
+          {ready &&
+            (user ? (
+              <>
+                <Link className="sign-in" href={roleHome(user.role)}>
+                  My workspace
+                </Link>
+                <button
+                  className="header-sign-out"
+                  type="button"
+                  onClick={clearSession}
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link className="sign-in" href="/sign-in">
+                  Sign in
+                </Link>
+                <Link className="button button-small" href="/join">
+                  Join MarketLink <Icon name="arrow" size={16} />
+                </Link>
+              </>
+            ))}
         </div>
         <button
           className="menu-toggle"
@@ -288,8 +300,8 @@ export function Footer() {
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© 2025 MarketLink</span>
-        <span>Made for local food people.</span>
+        <span>© 2026 MarketLink.All rights reserved</span>
+        <span>Fresh food. Familiar faces.</span>
       </div>
     </footer>
   );

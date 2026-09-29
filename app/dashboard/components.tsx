@@ -8,32 +8,38 @@ import { Icon, Logo } from "../components";
 
 type Role = "customer" | "farmer" | "admin";
 
-const navByRole: Record<Role, { label: string; icon: string; href: string }[]> = {
-  customer: [
-    { label: "Overview", icon: "home", href: "/customer/dashboard" },
-    { label: "My orders", icon: "package", href: "/customer/orders" },
-    { label: "Favorites", icon: "heart", href: "/customer/favorites" },
-    { label: "Notifications", icon: "bell", href: "/customer/notifications" },
-  ],
-  farmer: [
-    { label: "Dashboard", icon: "home", href: "/farmer/dashboard" },
-    { label: "Orders", icon: "package", href: "/farmer/orders" },
-    { label: "Products", icon: "leaf", href: "/farmer/products" },
-    { label: "Weekly inventory", icon: "chart", href: "/farmer/inventory" },
-    { label: "Markets", icon: "storefront", href: "/farmer/markets" },
-    { label: "Pickup slots", icon: "calendar", href: "/farmer/pickup-slots" },
-    { label: "Reviews", icon: "star", href: "/farmer/reviews" },
-  ],
-  admin: [
-    { label: "Overview", icon: "home", href: "/admin/dashboard" },
-    { label: "Farmers", icon: "users", href: "/admin/farmers" },
-    { label: "Customers", icon: "users", href: "/admin/customers" },
-    { label: "Orders", icon: "package", href: "/admin/orders" },
-    { label: "Markets", icon: "storefront", href: "/admin/markets" },
-    { label: "Categories", icon: "package", href: "/admin/categories" },
-    { label: "Announcements", icon: "bell", href: "/admin/announcements" },
-  ],
-};
+const navByRole: Record<Role, { label: string; icon: string; href: string }[]> =
+  {
+    customer: [
+      { label: "Overview", icon: "home", href: "/customer/dashboard" },
+      { label: "My orders", icon: "package", href: "/customer/orders" },
+      { label: "Favorites", icon: "heart", href: "/customer/favorites" },
+      { label: "Notifications", icon: "bell", href: "/customer/notifications" },
+    ],
+    farmer: [
+      { label: "Dashboard", icon: "home", href: "/farmer/dashboard" },
+      { label: "Farm profile", icon: "users", href: "/farmer/profile" },
+      { label: "Orders", icon: "package", href: "/farmer/orders" },
+      { label: "Products", icon: "leaf", href: "/farmer/products" },
+      { label: "Stock & pickup", icon: "chart", href: "/farmer/inventory" },
+      { label: "Markets", icon: "storefront", href: "/farmer/markets" },
+      {
+        label: "Pickup windows",
+        icon: "calendar",
+        href: "/farmer/pickup-slots",
+      },
+      { label: "Reviews", icon: "star", href: "/farmer/reviews" },
+    ],
+    admin: [
+      { label: "Overview", icon: "home", href: "/admin/dashboard" },
+      { label: "Farmers", icon: "users", href: "/admin/farmers" },
+      { label: "Customers", icon: "users", href: "/admin/customers" },
+      { label: "Orders", icon: "package", href: "/admin/orders" },
+      { label: "Markets", icon: "storefront", href: "/admin/markets" },
+      { label: "Categories", icon: "package", href: "/admin/categories" },
+      { label: "Announcements", icon: "bell", href: "/admin/announcements" },
+    ],
+  };
 
 const roleLabels: Record<Role, string> = {
   customer: "Customer space",
@@ -135,13 +141,19 @@ function DashboardSidebar({
       <div className="dashboard-farm-switch">
         <span className="farm-switch-avatar">
           <Icon
-            name={role === "farmer" ? "leaf" : role === "admin" ? "shield" : "users"}
+            name={
+              role === "farmer" ? "leaf" : role === "admin" ? "shield" : "users"
+            }
             size={19}
           />
         </span>
         <span>
           <strong>
-            {role === "farmer" ? "My farm" : role === "admin" ? "MarketLink Admin" : "My account"}
+            {role === "farmer"
+              ? "My farm"
+              : role === "admin"
+                ? "MarketLink Admin"
+                : "My account"}
           </strong>
           <small>{roleName} account</small>
         </span>
@@ -167,7 +179,9 @@ function DashboardSidebar({
           <span>?</span>
           <strong>Need some help?</strong>
           <small>Visit the MarketLink help center</small>
-          <Link href="/contact" onClick={onClose}>Get support</Link>
+          <Link href="/contact" onClick={onClose}>
+            Get support
+          </Link>
         </div>
         <Link
           className={`dashboard-nav-link ${pathname.startsWith(`/${role}/settings`) ? "active" : ""}`}
@@ -216,7 +230,9 @@ function DashboardHeader({
   const pageTitle =
     segment === "dashboard"
       ? "Dashboard"
-      : segment.replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+      : segment
+          .replaceAll("-", " ")
+          .replace(/\b\w/g, (letter) => letter.toUpperCase());
 
   return (
     <header className="dashboard-header">
@@ -228,11 +244,20 @@ function DashboardHeader({
         >
           <Icon name="menu" size={21} />
         </button>
-        <div className="dashboard-mobile-brand"><Logo /></div>
+        <div className="dashboard-mobile-brand">
+          <Logo />
+        </div>
         <div className="dashboard-topbar-title">
-          <small>{role === "farmer" ? "Farmer portal" : role === "admin" ? "Admin portal" : "Customer portal"}</small>
+          <small>
+            {role === "farmer"
+              ? "Farmer portal"
+              : role === "admin"
+                ? "Admin portal"
+                : "Customer portal"}
+          </small>
           <strong>{pageTitle}</strong>
         </div>
+        <span className="dashboard-header-spacer" aria-hidden="true" />
         {role === "customer" && (
           <Link
             className="dashboard-icon-button"
@@ -246,7 +271,13 @@ function DashboardHeader({
           <span className="avatar">{initials}</span>
           <div>
             <strong>{name}</strong>
-            <small>{role === "admin" ? "Administrator" : role === "farmer" ? "Farmer" : "Customer"}</small>
+            <small>
+              {role === "admin"
+                ? "Administrator"
+                : role === "farmer"
+                  ? "Farmer"
+                  : "Customer"}
+            </small>
           </div>
         </div>
       </div>

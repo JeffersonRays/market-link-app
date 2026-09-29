@@ -2,8 +2,10 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { api, apiData, patchBody } from "../lib/api";
+import { api, apiData, jsonBody, patchBody } from "../lib/api";
 import { ProtectedPage } from "./dashboard/ProtectedPage";
+import LocationPicker from "./map/LocationPicker";
+import { DashboardEmptyState } from "./dashboard/EmptyState";
 
 type Row = Record<string, unknown> & { id: number };
 type Field = {
@@ -11,6 +13,8 @@ type Field = {
   label: string;
   type?: string;
   required?: boolean;
+  latitudeName?: string;
+  longitudeName?: string;
   options?: { value: string; label: string }[];
 };
 type Config = {
@@ -29,36 +33,47 @@ const farmerConfig: Record<string, Config> = {
       { name: "name", label: "Product name", required: true },
       {
         name: "category_id",
-        label: "Category ID",
-        type: "number",
+        label: "Category",
+        type: "select",
         required: true,
       },
       { name: "unit", label: "Unit", required: true },
       { name: "description", label: "Description" },
-      { name: "image_url", label: "Image URL", type: "url" },
+      { name: "image", label: "Product photo", type: "file" },
     ],
   },
   inventory: {
-    title: "Weekly inventory",
+    title: "Stock and pickup",
     endpoint: "/farmer/inventory",
+    note: "Add stock and a pickup date together. Leave the times blank to use this market’s saved pickup hours, or enter a different window. MarketLink opens the pickup time automatically.",
     fields: [
       {
         name: "product_id",
-        label: "Product ID",
-        type: "number",
+        label: "Product",
+        type: "select",
         required: true,
       },
       {
         name: "farmer_market_id",
-        label: "My market membership ID",
-        type: "number",
+        label: "Market",
+        type: "select",
         required: true,
       },
       {
-        name: "week_start_date",
-        label: "Week starting",
+        name: "pickup_date",
+        label: "Pickup date",
         type: "date",
         required: true,
+      },
+      {
+        name: "start_time",
+        label: "Pickup starts (optional override)",
+        type: "time",
+      },
+      {
+        name: "end_time",
+        label: "Pickup ends (optional override)",
+        type: "time",
       },
       { name: "price", label: "Price (₦)", type: "number", required: true },
       {
@@ -67,14 +82,6 @@ const farmerConfig: Record<string, Config> = {
         type: "number",
         required: true,
       },
-      {
-        name: "stock_status",
-        label: "Status",
-        options: ["available", "sold_out", "unavailable"].map((value) => ({
-          value,
-          label: value,
-        })),
-      },
       { name: "notes", label: "Notes" },
     ],
   },
@@ -82,16 +89,25 @@ const farmerConfig: Record<string, Config> = {
     title: "My markets",
     endpoint: "/farmers/me/markets",
     fields: [
-      { name: "market_id", label: "Market ID", type: "number", required: true },
+      { name: "market_id", label: "Market", type: "select", required: true },
       { name: "stall_name", label: "Stall name" },
       { name: "stall_number", label: "Stall number" },
+      { name: "stall_description", label: "Stall details", type: "textarea" },
       {
         name: "operating_days",
-        label: "Operating days (comma separated)",
+        label: "Operating days",
+        type: "days",
         required: true,
       },
       { name: "pickup_start_time", label: "Pickup starts", type: "time" },
       { name: "pickup_end_time", label: "Pickup ends", type: "time" },
+      {
+        name: "stall_location",
+        label: "Stall location",
+        type: "location",
+        latitudeName: "stall_latitude",
+        longitudeName: "stall_longitude",
+      },
     ],
   },
   "pickup-slots": {
@@ -155,6 +171,7 @@ const adminConfig: Record<string, Config> = {
     endpoint: "/markets",
     fields: [
       { name: "name", label: "Market name", required: true },
+      { name: "image", label: "Market profile image (optional)", type: "file" },
       { name: "address", label: "Address", required: true },
       { name: "description", label: "Description" },
       {
@@ -164,8 +181,13 @@ const adminConfig: Record<string, Config> = {
       },
       { name: "open_time", label: "Opens", type: "time" },
       { name: "close_time", label: "Closes", type: "time" },
-      { name: "latitude", label: "Latitude", type: "number" },
-      { name: "longitude", label: "Longitude", type: "number" },
+      {
+        name: "market_location",
+        label: "Market location",
+        type: "location",
+        latitudeName: "latitude",
+        longitudeName: "longitude",
+      },
     ],
   },
   categories: {
@@ -201,6 +223,27 @@ const adminConfig: Record<string, Config> = {
 function buildPayload(form: FormData, fields: Field[]) {
   const result: Record<string, unknown> = {};
   for (const field of fields) {
+    if (field.type === "file") continue;
+    if (field.type === "location") {
+      const latitude = form.get(field.latitudeName || "");
+      const longitude = form.get(field.longitudeName || "");
+      if (
+        latitude != null &&
+        latitude !== "" &&
+        longitude != null &&
+        longitude !== ""
+      ) {
+        result[field.latitudeName!] = Number(latitude);
+        result[field.longitudeName!] = Number(longitude);
+      }
+      continue;
+    }
+    if (field.type === "days") {
+      result[field.name] = form
+        .getAll(field.name)
+        .map((day) => String(day).toLowerCase());
+      continue;
+    }
     const raw = form.get(field.name);
     if (raw == null || raw === "") continue;
     if (field.type === "number") result[field.name] = Number(raw);
@@ -209,10 +252,95 @@ function buildPayload(form: FormData, fields: Field[]) {
         .split(",")
         .map((day) => day.trim().toLowerCase())
         .filter(Boolean);
-    else if ((field.name === "starts_at" || field.name === "ends_at") && typeof raw === "string") result[field.name] = raw.replace("T", " ");
+    else if (
+      (field.name === "starts_at" || field.name === "ends_at") &&
+      typeof raw === "string"
+    )
+      result[field.name] = raw.replace("T", " ");
     else result[field.name] = raw;
   }
   return result;
+}
+
+function managementEmptyState(
+  role: "farmer" | "admin",
+  section: string,
+  hasForm: boolean,
+) {
+  if (hasForm) {
+    const label =
+      section === "markets"
+        ? "market"
+        : section === "pickup-slots"
+          ? "pickup slot"
+          : section === "stock-templates"
+            ? "stock template"
+            : section === "inventory"
+              ? "inventory record"
+              : section === "categories"
+                ? "category"
+                : "market";
+    return {
+      title: `Your ${label === "category" ? "categories" : label === "inventory record" ? "weekly inventory" : `${label}s`} will appear here`,
+      description: `Add your first ${label} using the form below. Your saved details will stay together in this workspace.`,
+      actionHref: "#management-form",
+      actionLabel: `Add ${label}`,
+      icon:
+        section === "markets"
+          ? "storefront"
+          : section === "categories"
+            ? "leaf"
+            : "calendar",
+    };
+  }
+  if (section === "orders")
+    return {
+      title:
+        role === "farmer"
+          ? "Your first order is still ahead"
+          : "No orders have arrived yet",
+      description:
+        role === "farmer"
+          ? "When a customer orders from your farm, you’ll find the order and pickup details here."
+          : "New customer orders will appear here as soon as they are placed.",
+      actionHref: role === "farmer" ? "/farmer/products" : "/admin/dashboard",
+      actionLabel: role === "farmer" ? "Manage products" : "Back to overview",
+      icon: "package",
+    };
+  if (section === "reviews")
+    return {
+      title: "Your customer feedback will show here",
+      description:
+        "After customers review an order, you’ll be able to read and reply to their feedback here.",
+      actionHref: "/farmer/profile",
+      actionLabel: "Update farm profile",
+      icon: "star",
+    };
+  if (section === "farmers")
+    return {
+      title: "No farmer applications yet",
+      description: "New farmer applications will appear here for your review.",
+      actionHref: "/admin/dashboard",
+      actionLabel: "Back to overview",
+      icon: "users",
+    };
+  if (section === "customers")
+    return {
+      title: "No customer accounts yet",
+      description:
+        "Customer accounts will appear here as people join MarketLink.",
+      actionHref: "/admin/dashboard",
+      actionLabel: "Back to overview",
+      icon: "users",
+    };
+  return {
+    title: "Nothing to show yet",
+    description:
+      "New activity and records will appear here when they are available.",
+    actionHref: `/${role}/dashboard`,
+    actionLabel: "Back to dashboard",
+    icon: "chart",
+  };
 }
 
 export function ManagementPage({
@@ -227,13 +355,18 @@ export function ManagementPage({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [choices, setChoices] = useState<
     Record<string, { value: string; label: string }[]>
   >({});
   const endpoint = config?.endpoint || "";
 
   const load = useCallback(async () => {
-    if (!config || config.list === false) return;
+    if (!config || config.list === false) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     try {
       if (endpoint === "profile-reviews") {
         const profile = await apiData<Row>("/farmers/me");
@@ -243,6 +376,8 @@ export function ManagementPage({
       setError(
         cause instanceof Error ? cause.message : "Could not load this page.",
       );
+    } finally {
+      setLoading(false);
     }
   }, [config, endpoint]);
   useEffect(() => {
@@ -307,10 +442,27 @@ export function ManagementPage({
     setBusy(true);
     setError("");
     setMessage("");
-    const payload = buildPayload(
-      new FormData(formElement),
-      config.fields,
+    const payload = buildPayload(new FormData(formElement), config.fields);
+    if (role === "farmer" && section === "inventory") {
+      const pickupDate = String(payload.pickup_date || "");
+      if (pickupDate) {
+        const monday = new Date(`${pickupDate}T00:00:00Z`);
+        const weekday = (monday.getUTCDay() + 6) % 7;
+        monday.setUTCDate(monday.getUTCDate() - weekday);
+        payload.week_start_date = monday.toISOString().slice(0, 10);
+      }
+    }
+    const missingDays = config.fields.some(
+      (field) =>
+        field.type === "days" &&
+        field.required &&
+        !(payload[field.name] as string[] | undefined)?.length,
     );
+    if (missingDays) {
+      setError("Choose at least one operating day.");
+      setBusy(false);
+      return;
+    }
     try {
       const path =
         role === "admin"
@@ -320,7 +472,16 @@ export function ManagementPage({
           : section === "markets"
             ? "/farmers/me/markets"
             : `/farmer/${section}`;
-      await api(path, { method: "POST", body: JSON.stringify(payload) });
+      const hasFileField = config.fields.some((field) => field.type === "file");
+      const multipart = hasFileField ? new FormData(formElement) : null;
+      if (multipart) {
+        const image = multipart.get("image");
+        if (!(image instanceof File) || !image.name) multipart.delete("image");
+      }
+      await api(path, {
+        method: "POST",
+        body: multipart || JSON.stringify(payload),
+      });
       setMessage("Saved successfully.");
       formElement.reset();
       await load();
@@ -331,10 +492,14 @@ export function ManagementPage({
     }
   }
 
-  async function update(path: string, data: unknown) {
+  async function update(
+    path: string,
+    data: unknown,
+    method: "PATCH" | "POST" = "PATCH",
+  ) {
     setError("");
     try {
-      await api(path, patchBody(data));
+      await api(path, method === "POST" ? jsonBody(data) : patchBody(data));
       await load();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not update.");
@@ -363,6 +528,9 @@ export function ManagementPage({
               </p>
             )}
             {message && <p role="status">{message}</p>}
+            {section === "products" && role === "farmer" && (
+              <FarmerProducts rows={rows} onUpdate={update} onSaved={load} />
+            )}
             {section === "orders" && role === "farmer" && (
               <div className="api-list">
                 {rows.map((row) => (
@@ -384,6 +552,7 @@ export function ManagementPage({
               </div>
             )}
             {role === "farmer" &&
+              section !== "products" &&
               [
                 "products",
                 "inventory",
@@ -407,11 +576,23 @@ export function ManagementPage({
                           row.category_name ||
                             row.stock_status ||
                             row.approval_status ||
-                            row.pickup_date ||
                             "",
                         )}
+                        {section === "inventory" &&
+                          typeof row.pickup_date === "string" && (
+                            <>
+                              {" "}
+                              · Pickup {String(row.pickup_date)}{" "}
+                              {String(row.pickup_start_time || "").slice(0, 5)}–
+                              {String(row.pickup_end_time || "").slice(0, 5)}
+                            </>
+                          )}
                       </p>
-                      <FarmerEditForm section={section} row={row} onSaved={load} />
+                      <FarmerEditForm
+                        section={section}
+                        row={row}
+                        onSaved={load}
+                      />
                       <div className="api-actions">
                         {section === "products" && (
                           <button
@@ -617,6 +798,7 @@ export function ManagementPage({
                     <p>
                       {String(row.address)} · {String(row.status)}
                     </p>
+                    <AdminMarketEditForm row={row} onSaved={load} />
                     <button
                       onClick={() =>
                         update(`/admin/markets/${row.id}`, {
@@ -653,36 +835,87 @@ export function ManagementPage({
                 ))}
               </div>
             )}
+            {!loading &&
+              rows.length === 0 &&
+              !error &&
+              config.list !== false &&
+              section !== "products" && (
+                <DashboardEmptyState
+                  {...managementEmptyState(
+                    role,
+                    section,
+                    Boolean(config.fields),
+                  )}
+                />
+              )}
             {config.fields && (
-              <form
-                className="api-form"
-                onSubmit={create}
-              >
+              <form id="management-form" className="api-form" onSubmit={create}>
                 <h2>Add {config.title.toLowerCase()}</h2>
                 {config.fields.map((field) => {
                   const options = choices[field.name] || field.options;
-                  return (
-                  <label key={field.name}>
-                    {field.label}
-                    {options ? (
-                      <select name={field.name} required={field.required}>
-                        <option value="">Choose</option>
-                        {options.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    ) : field.type === "textarea" ? (
-                      <textarea name={field.name} required={field.required} />
-                    ) : (
-                      <input
-                        name={field.name}
-                        type={field.type || "text"}
-                        required={field.required}
+                  if (field.type === "location")
+                    return (
+                      <LocationPicker
+                        key={field.name}
+                        label={field.label}
+                        latitudeName={field.latitudeName!}
+                        longitudeName={field.longitudeName!}
                       />
-                    )}
-                  </label>
+                    );
+                  if (field.type === "days")
+                    return (
+                      <fieldset className="api-days-field" key={field.name}>
+                        <legend>{field.label}</legend>
+                        <div className="api-day-options">
+                          {[
+                            "monday",
+                            "tuesday",
+                            "wednesday",
+                            "thursday",
+                            "friday",
+                            "saturday",
+                            "sunday",
+                          ].map((day) => (
+                            <label className="api-day-option" key={day}>
+                              <input
+                                type="checkbox"
+                                name={field.name}
+                                value={day}
+                              />
+                              {day.slice(0, 3)}
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                    );
+                  return (
+                    <label key={field.name}>
+                      {field.label}
+                      {options ? (
+                        <select name={field.name} required={field.required}>
+                          <option value="">Choose</option>
+                          {options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : field.type === "textarea" ? (
+                        <textarea name={field.name} required={field.required} />
+                      ) : (
+                        <input
+                          name={field.name}
+                          type={field.type || "text"}
+                          step={field.type === "number" ? "any" : undefined}
+                          accept={
+                            field.type === "file"
+                              ? "image/jpeg,image/png,image/webp,image/gif"
+                              : undefined
+                          }
+                          required={field.required}
+                        />
+                      )}
+                    </label>
                   );
                 })}
                 <button className="button" disabled={busy}>
@@ -690,10 +923,9 @@ export function ManagementPage({
                 </button>
               </form>
             )}
-            {rows.length === 0 && !config.fields && !error && (
-              <p>No records to show yet.</p>
-            )}
-            <p className="api-back">
+            <p
+              className={`api-back ${rows.length === 0 && !loading && !error ? "api-back-empty" : ""}`}
+            >
               <Link href={`/${role}/dashboard`}>← Back to dashboard</Link>
             </p>
           </div>
@@ -703,28 +935,216 @@ export function ManagementPage({
   );
 }
 
+function FarmerProducts({
+  rows,
+  onUpdate,
+  onSaved,
+}: {
+  rows: Row[];
+  onUpdate: (path: string, data: unknown) => void;
+  onSaved: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [productCategories, setProductCategories] = useState<
+    { value: string; label: string }[]
+  >([]);
+  useEffect(() => {
+    apiData<Row[]>("/categories")
+      .then((items) =>
+        setProductCategories(
+          items.map((item) => ({
+            value: String(item.id),
+            label: String(item.name),
+          })),
+        ),
+      )
+      .catch(() => undefined);
+  }, []);
+  const categories = [
+    ...new Set(rows.map((row) => String(row.category_name || "Other"))),
+  ];
+  const filtered = rows.filter((row) => {
+    const matchesText = `${row.name || ""} ${row.category_name || ""}`
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    return (
+      matchesText &&
+      (category === "all" || String(row.category_name || "Other") === category)
+    );
+  });
+  const active = rows.filter((row) => Boolean(row.is_active)).length;
+  const inactive = rows.length - active;
+
+  return (
+    <section
+      className="farmer-products-workspace"
+      aria-label="Product catalogue"
+    >
+      <div className="farmer-product-summary">
+        <article>
+          <span>Products in catalogue</span>
+          <strong>{rows.length}</strong>
+          <small>Across your farm catalogue</small>
+        </article>
+        <article>
+          <span>Active listings</span>
+          <strong>{active}</strong>
+          <small>Visible to customers</small>
+        </article>
+        <article>
+          <span>Paused listings</span>
+          <strong>{inactive}</strong>
+          <small>Can be activated any time</small>
+        </article>
+      </div>
+      <div className="farmer-product-panel">
+        <div className="farmer-product-toolbar">
+          <div>
+            <h2>Your products</h2>
+            <p>Keep names, categories, units, and product photos up to date.</p>
+          </div>
+          <div className="farmer-product-filters">
+            <label className="farmer-product-search">
+              <span className="sr-only">Search products</span>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search your catalogue"
+              />
+            </label>
+            <label>
+              <span className="sr-only">Filter by category</span>
+              <select
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+              >
+                <option value="all">All categories</option>
+                {categories.map((name) => (
+                  <option key={name}>{name}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </div>
+        {filtered.length ? (
+          <div className="farmer-product-table-wrap">
+            <table className="farmer-product-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Unit</th>
+                  <th>Listing</th>
+                  <th>Manage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <div className="farmer-product-identity">
+                        {row.image_url ? (
+                          <img src={String(row.image_url)} alt="" />
+                        ) : (
+                          <span
+                            className="farmer-product-placeholder"
+                            aria-hidden="true"
+                          >
+                            ✿
+                          </span>
+                        )}
+                        <div>
+                          <strong>
+                            {String(row.name || "Unnamed product")}
+                          </strong>
+                          <small>
+                            {String(row.description || "Farm fresh produce")}
+                          </small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{String(row.category_name || "Uncategorised")}</td>
+                    <td>{String(row.unit || "—")}</td>
+                    <td>
+                      <span
+                        className={`farmer-product-status ${row.is_active ? "is-active" : "is-paused"}`}
+                      >
+                        {row.is_active ? "Active" : "Paused"}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="farmer-product-manage">
+                        <FarmerEditForm
+                          section="products"
+                          row={row}
+                          onSaved={onSaved}
+                          categories={productCategories}
+                        />
+                        <button
+                          className="farmer-product-toggle"
+                          onClick={() =>
+                            onUpdate(`/farmer/products/${row.id}/status`, {
+                              is_active: !row.is_active,
+                            })
+                          }
+                        >
+                          {row.is_active ? "Pause" : "Activate"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="farmer-product-empty">
+            <strong>
+              {rows.length
+                ? "No matching products"
+                : "Your catalogue is ready for its first product"}
+            </strong>
+            <span>
+              {rows.length
+                ? "Try another product name or category."
+                : "Use the product form below to add a listing with its API-backed details."}
+            </span>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function OrderActions({
   order,
   onUpdate,
 }: {
   order: Row;
-  onUpdate: (path: string, body: unknown) => void;
+  onUpdate: (path: string, body: unknown, method?: "PATCH" | "POST") => void;
 }) {
   const id = order.id;
   if (order.status === "placed")
     return (
       <div className="api-actions">
-        <button onClick={() => onUpdate(`/orders/farmer/${id}/accept`, {})}>
+        <button
+          onClick={() => onUpdate(`/orders/farmer/${id}/accept`, {}, "POST")}
+        >
           Accept
         </button>
-        <button onClick={() => onUpdate(`/orders/farmer/${id}/decline`, {})}>
+        <button
+          onClick={() => onUpdate(`/orders/farmer/${id}/decline`, {}, "POST")}
+        >
           Decline
         </button>
       </div>
     );
   if (order.status === "accepted")
     return (
-      <button onClick={() => onUpdate(`/orders/farmer/${id}/ready`, {})}>
+      <button
+        onClick={() => onUpdate(`/orders/farmer/${id}/ready`, {}, "POST")}
+      >
         Mark ready for pickup
       </button>
     );
@@ -791,18 +1211,23 @@ function FarmerEditForm({
   section,
   row,
   onSaved,
+  categories = [],
 }: {
   section: string;
   row: Row;
   onSaved: () => void;
+  categories?: { value: string; label: string }[];
 }) {
   const [error, setError] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
   const fields: Field[] =
     section === "products"
       ? [
           { name: "name", label: "Name" },
+          { name: "category_id", label: "Category", options: categories },
           { name: "unit", label: "Unit" },
-          { name: "description", label: "Description" },
+          { name: "description", label: "Description", type: "textarea" },
+          { name: "image", label: "Replace product image", type: "file" },
         ]
       : section === "inventory"
         ? [
@@ -821,7 +1246,21 @@ function FarmerEditForm({
           ? [
               { name: "stall_name", label: "Stall name" },
               { name: "stall_number", label: "Stall number" },
-              { name: "operating_days", label: "Operating days" },
+              { name: "stall_description", label: "Stall details" },
+              { name: "operating_days", label: "Operating days", type: "days" },
+              {
+                name: "pickup_start_time",
+                label: "Pickup starts",
+                type: "time",
+              },
+              { name: "pickup_end_time", label: "Pickup ends", type: "time" },
+              {
+                name: "stall_location",
+                label: "Stall location",
+                type: "location",
+                latitudeName: "stall_latitude",
+                longitudeName: "stall_longitude",
+              },
             ]
           : section === "pickup-slots"
             ? [
@@ -831,7 +1270,11 @@ function FarmerEditForm({
                 { name: "capacity", label: "Capacity", type: "number" },
               ]
             : [
-                { name: "default_price", label: "Default price", type: "number" },
+                {
+                  name: "default_price",
+                  label: "Default price",
+                  type: "number",
+                },
                 {
                   name: "default_quantity",
                   label: "Default quantity",
@@ -844,59 +1287,245 @@ function FarmerEditForm({
     const form = new FormData(event.currentTarget);
     const body: Record<string, unknown> = {};
     for (const field of fields) {
+      if (field.type === "file") continue;
+      if (field.type === "location") {
+        const latitude = form.get(field.latitudeName || "");
+        const longitude = form.get(field.longitudeName || "");
+        if (
+          latitude != null &&
+          latitude !== "" &&
+          longitude != null &&
+          longitude !== ""
+        ) {
+          body[field.latitudeName!] = Number(latitude);
+          body[field.longitudeName!] = Number(longitude);
+        }
+        continue;
+      }
+      if (field.type === "days") {
+        body[field.name] = form
+          .getAll(field.name)
+          .map((day) => String(day).toLowerCase());
+        continue;
+      }
       const value = form.get(field.name);
       if (value == null || value === "") continue;
-      body[field.name] =
-        field.type === "number"
-          ? Number(value)
-          : field.name === "operating_days"
-            ? String(value)
-                .split(",")
-                .map((day) => day.trim().toLowerCase())
-                .filter(Boolean)
-            : value;
+      body[field.name] = field.type === "number" ? Number(value) : value;
     }
     try {
       const path =
         section === "markets"
           ? `/farmers/me/markets/${row.id}`
           : `/farmer/${section}/${row.id}`;
-      await api(path, patchBody(body));
+      const image = form.get("image");
+      const multipart = image instanceof File && image.name ? form : null;
+      await api(
+        path,
+        multipart ? { method: "PATCH", body: multipart } : patchBody(body),
+      );
       setError("");
       onSaved();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save changes.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not save changes.",
+      );
+    }
+  }
+
+  const form = (
+    <form className="api-inline-form" onSubmit={submit}>
+      {fields.map((field) =>
+        field.type === "location" ? (
+          <LocationPicker
+            key={field.name}
+            label={field.label}
+            latitudeName={field.latitudeName!}
+            longitudeName={field.longitudeName!}
+            initialLatitude={row[field.latitudeName!]}
+            initialLongitude={row[field.longitudeName!]}
+          />
+        ) : field.type === "days" ? (
+          <fieldset className="api-days-field" key={field.name}>
+            <legend>{field.label}</legend>
+            <div className="api-day-options">
+              {[
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday",
+              ].map((day) => (
+                <label className="api-day-option" key={day}>
+                  <input
+                    type="checkbox"
+                    name={field.name}
+                    value={day}
+                    defaultChecked={String(row[field.name] || "")
+                      .split(",")
+                      .includes(day)}
+                  />
+                  {day.slice(0, 3)}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : (
+          <label key={field.name}>
+            {field.label}
+            {field.options ? (
+              <select
+                name={field.name}
+                defaultValue={String(row[field.name] || "")}
+              >
+                {field.options.map((option) => (
+                  <option value={option.value} key={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : field.type === "textarea" ? (
+              <textarea
+                name={field.name}
+                defaultValue={String(row[field.name] ?? "")}
+              />
+            ) : (
+              <input
+                name={field.name}
+                type={field.type || "text"}
+                step={field.type === "number" ? "any" : undefined}
+                accept={
+                  field.type === "file"
+                    ? "image/jpeg,image/png,image/webp,image/gif"
+                    : undefined
+                }
+                defaultValue={
+                  field.type === "file"
+                    ? undefined
+                    : field.name === "operating_days"
+                      ? String(row[field.name] || "").replaceAll(",", ", ")
+                      : String(row[field.name] ?? "")
+                }
+              />
+            )}
+          </label>
+        ),
+      )}
+      <button>Save changes</button>
+      {error && <small role="alert">{error}</small>}
+    </form>
+  );
+  if (section === "products")
+    return (
+      <details className="farmer-product-edit">
+        <summary>Edit details</summary>
+        {form}
+      </details>
+    );
+  if (section === "markets")
+    return (
+      <details
+        className="farmer-product-edit"
+        onToggle={(event) => setEditOpen(event.currentTarget.open)}
+      >
+        <summary>Edit stall &amp; location</summary>
+        {editOpen && form}
+      </details>
+    );
+  return form;
+}
+
+function AdminMarketEditForm({
+  row,
+  onSaved,
+}: {
+  row: Row;
+  onSaved: () => void;
+}) {
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    const form = new FormData(event.currentTarget);
+    const body: Record<string, unknown> = {
+      name: form.get("name"),
+      address: form.get("address"),
+    };
+    const latitude = form.get("latitude");
+    const longitude = form.get("longitude");
+    if (latitude && longitude) {
+      body.latitude = Number(latitude);
+      body.longitude = Number(longitude);
+    }
+    try {
+      const image = form.get("image");
+      if (image instanceof File && image.name) {
+        const multipart = new FormData();
+        Object.entries(body).forEach(([key, value]) =>
+          multipart.set(key, String(value)),
+        );
+        multipart.set("image", image);
+        await api(`/admin/markets/${row.id}`, {
+          method: "PATCH",
+          body: multipart,
+        });
+      } else {
+        await api(`/admin/markets/${row.id}`, patchBody(body));
+      }
+      onSaved();
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not update the market.",
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
   return (
-    <form className="api-inline-form" onSubmit={submit}>
-      {fields.map((field) => (
-        <label key={field.name}>
-          {field.label}
-          {field.options ? (
-            <select name={field.name} defaultValue={String(row[field.name] || "")}>
-              {field.options.map((option) => (
-                <option value={option.value} key={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          ) : (
+    <details
+      className="admin-market-edit"
+      onToggle={(event) => setEditOpen(event.currentTarget.open)}
+    >
+      <summary>Edit market details or pin</summary>
+      {editOpen && (
+        <form className="api-inline-form" onSubmit={submit}>
+          <label>
+            Market name
+            <input name="name" required defaultValue={String(row.name || "")} />
+          </label>
+          <label>
+            Market address
             <input
-              name={field.name}
-              type={field.type || "text"}
-              defaultValue={
-                field.name === "operating_days"
-                  ? String(row[field.name] || "").replaceAll(",", ", ")
-                  : String(row[field.name] ?? "")
-              }
+              name="address"
+              required
+              defaultValue={String(row.address || "")}
             />
-          )}
-        </label>
-      ))}
-      <button>Save changes</button>
-      {error && <small role="alert">{error}</small>}
-    </form>
+          </label>
+          <label>
+            Market profile image (optional)
+            <input
+              name="image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+            />
+          </label>
+          <LocationPicker
+            label="Market location"
+            latitudeName="latitude"
+            longitudeName="longitude"
+            initialLatitude={row.latitude}
+            initialLongitude={row.longitude}
+          />
+          <button disabled={busy}>{busy ? "Saving…" : "Save market"}</button>
+          {error && <small role="alert">{error}</small>}
+        </form>
+      )}
+    </details>
   );
 }
